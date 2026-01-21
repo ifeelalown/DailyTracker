@@ -113,6 +113,17 @@ function App() {
     return DEFAULT_QUESTS.map(q => ({ ...q, completed: false }))
   })
 
+  // Quêtes personnalisées
+  const [customQuests, setCustomQuests] = useState([])
+
+  // Pénalités d'aujourd'hui
+  const [todayPenalties, setTodayPenalties] = useState(() => {
+    return PENALTIES.map(p => ({ ...p, applied: false }))
+  })
+
+  // Historique
+  const [history, setHistory] = useState([])
+
   // Marquer les quêtes complétées depuis les données publiques
   useEffect(() => {
     if (publicData?.completedToday) {
@@ -126,17 +137,6 @@ function App() {
       })))
     }
   }, [publicData])
-
-  // Quêtes personnalisées
-  const [customQuests, setCustomQuests] = useState([])
-
-  // Pénalités d'aujourd'hui
-  const [todayPenalties, setTodayPenalties] = useState(() => {
-    return PENALTIES.map(p => ({ ...p, applied: false }))
-  })
-
-  // Historique
-  const [history, setHistory] = useState([])
 
   // Modal pour nouvelle quête
   const [showAddQuest, setShowAddQuest] = useState(false)
