@@ -5,7 +5,8 @@
   max-width: 600px;
   margin: 0 auto;
   padding: 0 16px;
-  animation: fadeInUp 0.5s ease-out;
+  position: relative;
+  z-index: 1;
 }
 
 /* Status Bar */

@@ -51,35 +51,9 @@ body {
   overflow-x: hidden;
 }
 
-/* Animated background particles */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image:
-    radial-gradient(2px 2px at 20px 30px, rgba(139, 92, 246, 0.3), transparent),
-    radial-gradient(2px 2px at 40px 70px, rgba(0, 212, 255, 0.2), transparent),
-    radial-gradient(1px 1px at 90px 40px, rgba(139, 92, 246, 0.3), transparent),
-    radial-gradient(2px 2px at 130px 80px, rgba(0, 212, 255, 0.2), transparent),
-    radial-gradient(1px 1px at 160px 120px, rgba(139, 92, 246, 0.4), transparent);
-  background-size: 200px 200px;
-  animation: floatParticles 20s linear infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@keyframes floatParticles {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-200px); }
-}
-
 #root {
   min-height: 100vh;
   position: relative;
-  z-index: 1;
 }
 
 /* Scrollbar */
