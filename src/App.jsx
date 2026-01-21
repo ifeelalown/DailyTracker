@@ -51,59 +51,70 @@ const PENALTIES = [
 ]
 
 function App() {
-  // État du joueur
-  const [player, setPlayer] = useState(() => {
-    const saved = localStorage.getItem('dailyTracker_player')
-    return saved ? JSON.parse(saved) : {
-      name: 'Hunter',
-      xp: 0,
-      stats: {
-        strength: 10,
-        intelligence: 10,
-        endurance: 10,
-        vitality: 10,
-        discipline: 10,
-      },
-      streak: 0,
-      lastActiveDate: null,
-    }
+  // État du joueur - chargé depuis le JSON public
+  const [player, setPlayer] = useState({
+    name: 'Hunter',
+    xp: 0,
+    stats: {
+      strength: 10,
+      intelligence: 10,
+      endurance: 10,
+      vitality: 10,
+      discipline: 10,
+    },
+    streak: 0,
+    lastActiveDate: null,
   })
+
+  // Données publiques depuis le JSON
+  const [publicData, setPublicData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  // Charger les données publiques depuis le JSON
+  useEffect(() => {
+    fetch('/data/tracker.json')
+      .then(res => res.json())
+      .then(data => {
+        setPublicData(data)
+        setPlayer(prev => ({
+          ...prev,
+          xp: data.xp || 0,
+          stats: data.stats || prev.stats,
+        }))
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
 
   // Quêtes d'aujourd'hui
   const [todayQuests, setTodayQuests] = useState(() => {
-    const saved = localStorage.getItem('dailyTracker_todayQuests')
-    const savedDate = localStorage.getItem('dailyTracker_questDate')
-    const today = new Date().toDateString()
-
-    if (saved && savedDate === today) {
-      return JSON.parse(saved)
-    }
     return DEFAULT_QUESTS.map(q => ({ ...q, completed: false }))
   })
 
+  // Marquer les quêtes complétées depuis les données publiques
+  useEffect(() => {
+    if (publicData?.completedToday) {
+      setTodayQuests(prev => prev.map(q => ({
+        ...q,
+        completed: publicData.completedToday.includes(q.id)
+      })))
+      setTodayPenalties(prev => prev.map(p => ({
+        ...p,
+        applied: publicData.penaltiesToday?.includes(p.id) || false
+      })))
+    }
+  }, [publicData])
+
   // Quêtes personnalisées
-  const [customQuests, setCustomQuests] = useState(() => {
-    const saved = localStorage.getItem('dailyTracker_customQuests')
-    return saved ? JSON.parse(saved) : []
-  })
+  const [customQuests, setCustomQuests] = useState([])
 
   // Pénalités d'aujourd'hui
   const [todayPenalties, setTodayPenalties] = useState(() => {
-    const saved = localStorage.getItem('dailyTracker_todayPenalties')
-    const savedDate = localStorage.getItem('dailyTracker_penaltyDate')
-    const today = new Date().toDateString()
-
-    if (saved && savedDate === today) {
-      return JSON.parse(saved)
-    }
     return PENALTIES.map(p => ({ ...p, applied: false }))
   })
 
   // Historique
-  const [history, setHistory] = useState(() => {
-    const saved = localStorage.getItem('dailyTracker_history')
-    return saved ? JSON.parse(saved) : []
-  })
+  const [history, setHistory] = useState([])
 
   // Modal pour nouvelle quête
   const [showAddQuest, setShowAddQuest] = useState(false)
@@ -123,28 +134,6 @@ function App() {
     return questXp + customXp + penaltyXp
   }, [todayQuests, customQuests, todayPenalties])
 
-  // Sauvegardes
-  useEffect(() => {
-    localStorage.setItem('dailyTracker_player', JSON.stringify(player))
-  }, [player])
-
-  useEffect(() => {
-    localStorage.setItem('dailyTracker_todayQuests', JSON.stringify(todayQuests))
-    localStorage.setItem('dailyTracker_questDate', new Date().toDateString())
-  }, [todayQuests])
-
-  useEffect(() => {
-    localStorage.setItem('dailyTracker_customQuests', JSON.stringify(customQuests))
-  }, [customQuests])
-
-  useEffect(() => {
-    localStorage.setItem('dailyTracker_todayPenalties', JSON.stringify(todayPenalties))
-    localStorage.setItem('dailyTracker_penaltyDate', new Date().toDateString())
-  }, [todayPenalties])
-
-  useEffect(() => {
-    localStorage.setItem('dailyTracker_history', JSON.stringify(history))
-  }, [history])
 
   // Compléter une quête
   const completeQuest = (questId, isCustom = false) => {
@@ -213,8 +202,25 @@ function App() {
   const completedCount = todayQuests.filter(q => q.completed).length + customQuests.filter(q => q.completed).length
   const totalQuests = todayQuests.length + customQuests.length
 
+  if (loading) {
+    return (
+      <div className="app" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div style={{ textAlign: 'center', color: 'var(--accent-blue)' }}>
+          <div style={{ fontSize: '24px', marginBottom: '10px' }}>Chargement...</div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="app">
+      {/* Dernière mise à jour */}
+      {publicData?.lastUpdated && (
+        <div style={{ textAlign: 'center', padding: '10px', color: 'var(--text-muted)', fontSize: '12px' }}>
+          Dernière mise à jour: {new Date(publicData.lastUpdated).toLocaleString('fr-FR')}
+        </div>
+      )}
+
       {/* Header avec stats du joueur */}
       <header className="player-header">
         <div className="player-info">
@@ -455,6 +461,42 @@ function App() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Historique récent */}
+      {publicData?.history && publicData.history.length > 0 && (
+        <section className="history-section" style={{ marginBottom: '24px' }}>
+          <h2 style={{ fontFamily: 'Orbitron, sans-serif', fontSize: '18px', color: 'var(--text-primary)', marginBottom: '12px' }}>
+            Historique Récent
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {publicData.history.slice(-10).reverse().map((entry, i) => (
+              <div key={i} style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '10px',
+                padding: '12px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{entry.action}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '12px', marginLeft: '10px' }}>
+                    {new Date(entry.date).toLocaleDateString('fr-FR')}
+                  </span>
+                </div>
+                <span style={{
+                  fontFamily: 'Orbitron, sans-serif',
+                  color: entry.xp >= 0 ? 'var(--accent-green)' : 'var(--accent-red)',
+                  fontWeight: '700'
+                }}>
+                  {entry.xp >= 0 ? '+' : ''}{entry.xp} XP
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Footer */}
