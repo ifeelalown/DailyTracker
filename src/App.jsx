@@ -1,17 +1,18 @@
 import { useState, useEffect, useMemo } from 'react'
 import './App.css'
 
-// Calcul du niveau basé sur l'XP (formule exponentielle)
+// Calcul du niveau basé sur l'XP (formule DIFFICILE - progression lente)
 const calculateLevel = (xp) => {
-  return Math.floor(Math.pow(xp / 100, 0.5)) + 1
+  if (xp < 0) return 1
+  return Math.floor(Math.pow(xp / 200, 0.45)) + 1
 }
 
 const calculateXpForLevel = (level) => {
-  return Math.pow(level - 1, 2) * 100
+  return Math.round(Math.pow((level - 1) / 1, 2.22) * 200)
 }
 
 const calculateXpForNextLevel = (level) => {
-  return Math.pow(level, 2) * 100
+  return Math.round(Math.pow(level / 1, 2.22) * 200)
 }
 
 // Rangs selon le niveau (style Solo Leveling)
@@ -25,29 +26,32 @@ const getRank = (level) => {
   return { name: 'E', color: '#888888', glow: 'none' }
 }
 
-// Quêtes par défaut
+// Quêtes par défaut - Système DIFFICILE (peu d'XP à gagner)
 const DEFAULT_QUESTS = [
-  // Sport & Santé
-  { id: 'workout', title: 'Entraînement', description: 'Faire une séance de sport', xp: 50, stat: 'strength', category: 'sport', icon: '💪' },
-  { id: 'cardio', title: 'Cardio', description: '30min de cardio', xp: 40, stat: 'endurance', category: 'sport', icon: '🏃' },
-  { id: 'water', title: 'Hydratation', description: 'Boire 2L d\'eau', xp: 20, stat: 'vitality', category: 'sport', icon: '💧' },
-  { id: 'sleep', title: 'Sommeil', description: '7h+ de sommeil', xp: 30, stat: 'vitality', category: 'sport', icon: '😴' },
-  { id: 'noJunkFood', title: 'Clean Eating', description: 'Pas de junk food', xp: 25, stat: 'vitality', category: 'sport', icon: '🥗' },
-  // Productivité
-  { id: 'study', title: 'Étude', description: '2h d\'étude/travail', xp: 45, stat: 'intelligence', category: 'productivity', icon: '📚' },
-  { id: 'reading', title: 'Lecture', description: 'Lire 30min', xp: 30, stat: 'intelligence', category: 'productivity', icon: '📖' },
-  { id: 'noSocial', title: 'Focus Mode', description: 'Pas de réseaux sociaux', xp: 35, stat: 'discipline', category: 'productivity', icon: '📵' },
-  { id: 'wakeEarly', title: 'Early Bird', description: 'Lever avant 7h', xp: 40, stat: 'discipline', category: 'productivity', icon: '⏰' },
-  { id: 'meditation', title: 'Méditation', description: '10min de méditation', xp: 25, stat: 'discipline', category: 'productivity', icon: '🧘' },
+  // Santé & Sport
+  { id: 'steps', title: '7000 Pas', description: 'Faire 7000 pas dans la journée', xp: 15, stat: 'endurance', category: 'sport', icon: '👟' },
+  { id: 'water', title: 'Hydratation', description: 'Boire 2L d\'eau', xp: 10, stat: 'vitality', category: 'sport', icon: '💧' },
+  { id: 'workout', title: 'Sport', description: 'Une séance de sport', xp: 20, stat: 'strength', category: 'sport', icon: '💪' },
+  { id: 'eatHealthy', title: 'Manger Sain', description: 'Alimentation saine aujourd\'hui', xp: 15, stat: 'vitality', category: 'sport', icon: '🥗' },
+  // Productivité & Discipline
+  { id: 'work8h', title: 'Travail 8h', description: 'Travailler 8 heures', xp: 25, stat: 'intelligence', category: 'productivity', icon: '💼' },
+  { id: 'reading', title: 'Lecture', description: 'Lire 30 minutes', xp: 15, stat: 'intelligence', category: 'productivity', icon: '📖' },
+  { id: 'noPhoneWake', title: 'Réveil Sans Tel', description: 'Pas de téléphone au réveil', xp: 10, stat: 'discipline', category: 'productivity', icon: '🌅' },
+  { id: 'noPhoneSleep', title: 'Coucher Sans Tel', description: 'Pas de téléphone au coucher', xp: 10, stat: 'discipline', category: 'productivity', icon: '🌙' },
 ]
 
-// Pénalités
+// Pénalités - Système DIFFICILE (beaucoup d'XP à perdre)
 const PENALTIES = [
-  { id: 'missedWorkout', title: 'Pas de sport', xp: -30, stat: 'strength' },
-  { id: 'junkFood', title: 'Junk food', xp: -20, stat: 'vitality' },
-  { id: 'lateSleep', title: 'Couché après minuit', xp: -25, stat: 'vitality' },
-  { id: 'procrastination', title: 'Procrastination', xp: -35, stat: 'discipline' },
-  { id: 'tooMuchSocial', title: '+2h réseaux sociaux', xp: -30, stat: 'discipline' },
+  { id: 'missedSteps', title: 'Pas de 7000 pas', xp: -40, stat: 'endurance' },
+  { id: 'noWater', title: 'Pas assez d\'eau', xp: -30, stat: 'vitality' },
+  { id: 'missedWorkout', title: 'Pas de sport', xp: -50, stat: 'strength' },
+  { id: 'junkFood', title: 'Junk food / Mal mangé', xp: -45, stat: 'vitality' },
+  { id: 'noWork', title: 'Pas travaillé 8h', xp: -60, stat: 'intelligence' },
+  { id: 'noReading', title: 'Pas de lecture', xp: -35, stat: 'intelligence' },
+  { id: 'phoneWake', title: 'Tel au réveil', xp: -40, stat: 'discipline' },
+  { id: 'phoneSleep', title: 'Tel au coucher', xp: -40, stat: 'discipline' },
+  { id: 'procrastination', title: 'Procrastination', xp: -50, stat: 'discipline' },
+  { id: 'stayedUpLate', title: 'Couché après minuit', xp: -35, stat: 'vitality' },
 ]
 
 function App() {
