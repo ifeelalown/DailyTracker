@@ -224,6 +224,14 @@ function App() {
   const completedCount = todayQuests.filter(q => q.completed).length + customQuests.filter(q => q.completed).length
   const totalQuests = todayQuests.length + customQuests.length
 
+  // Calcul de la puissance totale (DOIT être avant le return conditionnel)
+  const totalPower = useMemo(() => {
+    const statsSum = Object.values(player.stats).reduce((a, b) => a + b, 0)
+    return Math.floor((level * 100) + (statsSum * 2) + (player.xp / 10))
+  }, [level, player.stats, player.xp])
+
+  const weekend = isWeekend()
+
   if (loading) {
     return (
       <div className="app" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
@@ -233,14 +241,6 @@ function App() {
       </div>
     )
   }
-
-  // Calcul de la puissance totale
-  const totalPower = useMemo(() => {
-    const statsSum = Object.values(player.stats).reduce((a, b) => a + b, 0)
-    return Math.floor((level * 100) + (statsSum * 2) + (player.xp / 10))
-  }, [level, player.stats, player.xp])
-
-  const weekend = isWeekend()
 
   return (
     <div className="app">
