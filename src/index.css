@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  /* Solo Leveling Colors */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: #1a1a2e;
+  --bg-card-hover: #252542;
+
+  --accent-blue: #00d4ff;
+  --accent-purple: #7b2cbf;
+  --accent-pink: #e040fb;
+  --accent-gold: #ffd700;
+  --accent-red: #ff3366;
+  --accent-green: #00ff88;
+
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0b0;
+  --text-muted: #606070;
+
+  --border-color: #2a2a3e;
+  --glow-blue: 0 0 20px rgba(0, 212, 255, 0.5);
+  --glow-purple: 0 0 20px rgba(123, 44, 191, 0.5);
+  --glow-gold: 0 0 20px rgba(255, 215, 0, 0.5);
+
+  font-family: 'Rajdhani', sans-serif;
+  line-height: 1.5;
+  font-weight: 500;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  background-image:
+    radial-gradient(ellipse at top, rgba(123, 44, 191, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-purple);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
+
+/* Selection */
+::selection {
+  background: var(--accent-purple);
+  color: white;
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: var(--glow-blue); }
+  50% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.8); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes level-up {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.font-display {
+  font-family: 'Orbitron', sans-serif;
+}
