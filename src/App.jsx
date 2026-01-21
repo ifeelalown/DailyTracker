@@ -78,12 +78,16 @@ function App() {
     name: 'Hunter',
     xp: 0,
     stats: {
-      strength: 10,
-      intelligence: 10,
-      endurance: 10,
-      vitality: 10,
-      discipline: 10,
+      steps: 0,
+      workouts: 0,
+      workHours: 0,
+      readingMins: 0,
+      posts: 0,
+      sleepHours: 0,
     },
+    daysTracked: 0,
+    questsCompleted: 0,
+    questsTotal: 0,
     streak: 0,
     lastActiveDate: null,
   })
@@ -102,6 +106,9 @@ function App() {
           ...prev,
           xp: data.xp || 0,
           stats: data.stats || prev.stats,
+          daysTracked: data.daysTracked || 0,
+          questsCompleted: data.questsCompleted || 0,
+          questsTotal: data.questsTotal || 0,
         }))
         setLoading(false)
       })
@@ -225,10 +232,10 @@ function App() {
   const totalQuests = todayQuests.length + customQuests.length
 
   // Calcul de la puissance totale (DOIT être avant le return conditionnel)
+  const winRate = player.questsTotal > 0 ? (player.questsCompleted / player.questsTotal) * 100 : 0
   const totalPower = useMemo(() => {
-    const statsSum = Object.values(player.stats).reduce((a, b) => a + b, 0)
-    return Math.floor((level * 100) + (statsSum * 2) + (player.xp / 10))
-  }, [level, player.stats, player.xp])
+    return Math.floor((level * 100) + (winRate * 10) + (player.xp / 10))
+  }, [level, winRate, player.xp])
 
   const weekend = isWeekend()
 
@@ -280,29 +287,45 @@ function App() {
 
         <div className="stats-grid">
           <div className="stat-item">
+            <span className="stat-icon">👟</span>
+            <span className="stat-name">PAS</span>
+            <span className="stat-value">{player.daysTracked > 0 ? Math.round(player.stats.steps / player.daysTracked).toLocaleString() : 0}</span>
+            <span className="stat-avg">/jour</span>
+          </div>
+          <div className="stat-item">
             <span className="stat-icon">💪</span>
-            <span className="stat-name">STR</span>
-            <span className="stat-value">{player.stats.strength}</span>
+            <span className="stat-name">SPORT</span>
+            <span className="stat-value">{player.daysTracked > 0 ? (player.stats.workouts / player.daysTracked).toFixed(1) : 0}</span>
+            <span className="stat-avg">/jour</span>
           </div>
           <div className="stat-item">
-            <span className="stat-icon">🧠</span>
-            <span className="stat-name">INT</span>
-            <span className="stat-value">{player.stats.intelligence}</span>
+            <span className="stat-icon">💼</span>
+            <span className="stat-name">TRAVAIL</span>
+            <span className="stat-value">{player.daysTracked > 0 ? (player.stats.workHours / player.daysTracked).toFixed(1) : 0}h</span>
+            <span className="stat-avg">/jour</span>
           </div>
           <div className="stat-item">
-            <span className="stat-icon">🏃</span>
-            <span className="stat-name">END</span>
-            <span className="stat-value">{player.stats.endurance}</span>
+            <span className="stat-icon">📖</span>
+            <span className="stat-name">LECTURE</span>
+            <span className="stat-value">{player.daysTracked > 0 ? Math.round(player.stats.readingMins / player.daysTracked) : 0}m</span>
+            <span className="stat-avg">/jour</span>
           </div>
           <div className="stat-item">
-            <span className="stat-icon">❤️</span>
-            <span className="stat-name">VIT</span>
-            <span className="stat-value">{player.stats.vitality}</span>
+            <span className="stat-icon">📱</span>
+            <span className="stat-name">POSTS</span>
+            <span className="stat-value">{player.daysTracked > 0 ? (player.stats.posts / player.daysTracked).toFixed(1) : 0}</span>
+            <span className="stat-avg">/jour</span>
           </div>
           <div className="stat-item">
-            <span className="stat-icon">🎯</span>
-            <span className="stat-name">DIS</span>
-            <span className="stat-value">{player.stats.discipline}</span>
+            <span className="stat-icon">😴</span>
+            <span className="stat-name">SOMMEIL</span>
+            <span className="stat-value">{player.daysTracked > 0 ? (player.stats.sleepHours / player.daysTracked).toFixed(1) : 0}h</span>
+            <span className="stat-avg">/jour</span>
+          </div>
+          <div className="stat-item win-rate">
+            <span className="stat-icon">🏆</span>
+            <span className="stat-name">WIN RATE</span>
+            <span className="stat-value">{player.questsTotal > 0 ? Math.round((player.questsCompleted / player.questsTotal) * 100) : 0}%</span>
           </div>
         </div>
       </header>

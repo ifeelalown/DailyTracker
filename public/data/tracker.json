@@ -1,69 +1,21 @@
 {
-  "lastUpdated": "2026-01-22T15:00:00Z",
+  "lastUpdated": "2026-01-22T23:00:00Z",
   "xp": 0,
   "level": 1,
   "rank": "E",
   "stats": {
-    "strength": 10,
-    "intelligence": 10,
-    "endurance": 10,
-    "vitality": 10,
-    "discipline": 10
+    "steps": 0,
+    "workouts": 0,
+    "workHours": 0,
+    "readingMins": 0,
+    "posts": 0,
+    "sleepHours": 0
   },
+  "daysTracked": 0,
+  "questsCompleted": 0,
+  "questsTotal": 0,
   "completedToday": [],
   "penaltiesToday": [],
   "history": [],
-  "streak": 0,
-  "dailyQuests": {
-    "weekday": [
-      { "id": "steps", "title": "7000 Pas", "xp": 15 },
-      { "id": "water", "title": "Hydratation 2L", "xp": 10 },
-      { "id": "workout", "title": "Sport", "xp": 20 },
-      { "id": "eatHealthy", "title": "Manger Sain", "xp": 15 },
-      { "id": "work", "title": "Travail 8h", "xp": 25 },
-      { "id": "reading", "title": "Lecture 30min", "xp": 15 },
-      { "id": "post", "title": "1 Post", "xp": 20 },
-      { "id": "noPhoneWake", "title": "Réveil Sans Tel", "xp": 10 },
-      { "id": "noPhoneSleep", "title": "Coucher Sans Tel", "xp": 10 }
-    ],
-    "weekend": [
-      { "id": "steps", "title": "7000 Pas", "xp": 15 },
-      { "id": "water", "title": "Hydratation 2L", "xp": 10 },
-      { "id": "workout", "title": "Sport", "xp": 20 },
-      { "id": "eatHealthy", "title": "Manger Sain", "xp": 15 },
-      { "id": "work", "title": "Travail 3-4h", "xp": 15 },
-      { "id": "reading", "title": "Lecture 30min", "xp": 15 },
-      { "id": "post", "title": "1 Post", "xp": 20 },
-      { "id": "noPhoneWake", "title": "Réveil Sans Tel", "xp": 10 },
-      { "id": "noPhoneSleep", "title": "Coucher Sans Tel", "xp": 10 }
-    ]
-  },
-  "penalties": {
-    "weekday": [
-      { "id": "missedSteps", "title": "Pas de 7000 pas", "xp": -40 },
-      { "id": "noWater", "title": "Pas assez d'eau", "xp": -30 },
-      { "id": "missedWorkout", "title": "Pas de sport", "xp": -50 },
-      { "id": "junkFood", "title": "Junk food", "xp": -45 },
-      { "id": "noWork", "title": "Pas travaillé 8h", "xp": -60 },
-      { "id": "noReading", "title": "Pas de lecture", "xp": -35 },
-      { "id": "noPost", "title": "Pas de post", "xp": -40 },
-      { "id": "phoneWake", "title": "Tel au réveil", "xp": -40 },
-      { "id": "phoneSleep", "title": "Tel au coucher", "xp": -40 },
-      { "id": "procrastination", "title": "Procrastination", "xp": -50 },
-      { "id": "stayedUpLate", "title": "Couché après minuit", "xp": -35 }
-    ],
-    "weekend": [
-      { "id": "missedSteps", "title": "Pas de 7000 pas", "xp": -40 },
-      { "id": "noWater", "title": "Pas assez d'eau", "xp": -30 },
-      { "id": "missedWorkout", "title": "Pas de sport", "xp": -50 },
-      { "id": "junkFood", "title": "Junk food", "xp": -45 },
-      { "id": "noWork", "title": "Pas travaillé 3-4h", "xp": -35 },
-      { "id": "noReading", "title": "Pas de lecture", "xp": -35 },
-      { "id": "noPost", "title": "Pas de post", "xp": -40 },
-      { "id": "phoneWake", "title": "Tel au réveil", "xp": -40 },
-      { "id": "phoneSleep", "title": "Tel au coucher", "xp": -40 },
-      { "id": "procrastination", "title": "Procrastination", "xp": -50 },
-      { "id": "stayedUpLate", "title": "Couché après minuit", "xp": -35 }
-    ]
-  }
+  "streak": 0
 }

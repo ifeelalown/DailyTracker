@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const { action, questId, penaltyId, customAction, customXp } = req.body;
+  const { action, questId, penaltyId, customAction, customXp, stats } = req.body;
 
   if (!action) {
     return res.status(400).json({ error: 'Action required' });
@@ -60,42 +60,57 @@ export default async function handler(req, res) {
 
     // Quest and penalty definitions
     const quests = {
-      steps: { title: '7000 Pas', xp: 15, stat: 'endurance' },
-      water: { title: 'Hydratation 2L', xp: 10, stat: 'vitality' },
-      workout: { title: 'Sport', xp: 20, stat: 'strength' },
-      eatHealthy: { title: 'Manger Sain', xp: 15, stat: 'vitality' },
-      work: { title: isWeekend ? 'Travail 3-4h' : 'Travail 8h', xp: isWeekend ? 15 : 25, stat: 'intelligence' },
-      reading: { title: 'Lecture 30min', xp: 15, stat: 'intelligence' },
-      post: { title: '1 Post', xp: 20, stat: 'discipline' },
-      noPhoneWake: { title: 'Réveil Sans Tel', xp: 10, stat: 'discipline' },
-      noPhoneSleep: { title: 'Coucher Sans Tel', xp: 10, stat: 'discipline' },
+      steps: { title: '7000 Pas', xp: 15 },
+      water: { title: 'Hydratation 2L', xp: 10 },
+      workout: { title: 'Sport', xp: 20 },
+      eatHealthy: { title: 'Manger Sain', xp: 15 },
+      work: { title: isWeekend ? 'Travail 3-4h' : 'Travail 8h', xp: isWeekend ? 15 : 25 },
+      reading: { title: 'Lecture 30min', xp: 15 },
+      post: { title: '1 Post', xp: 20 },
+      noPhoneWake: { title: 'Réveil Sans Tel', xp: 10 },
+      noPhoneSleep: { title: 'Coucher Sans Tel', xp: 10 },
     };
 
     const penalties = {
-      missedSteps: { title: 'Pas de 7000 pas', xp: -40, stat: 'endurance' },
-      noWater: { title: 'Pas assez d\'eau', xp: -30, stat: 'vitality' },
-      missedWorkout: { title: 'Pas de sport', xp: -50, stat: 'strength' },
-      junkFood: { title: 'Junk food', xp: -45, stat: 'vitality' },
-      noWork: { title: isWeekend ? 'Pas travaillé 3-4h' : 'Pas travaillé 8h', xp: isWeekend ? -35 : -60, stat: 'intelligence' },
-      noReading: { title: 'Pas de lecture', xp: -35, stat: 'intelligence' },
-      noPost: { title: 'Pas de post', xp: -40, stat: 'discipline' },
-      phoneWake: { title: 'Tel au réveil', xp: -40, stat: 'discipline' },
-      phoneSleep: { title: 'Tel au coucher', xp: -40, stat: 'discipline' },
-      procrastination: { title: 'Procrastination', xp: -50, stat: 'discipline' },
-      stayedUpLate: { title: 'Couché après minuit', xp: -35, stat: 'vitality' },
+      missedSteps: { title: 'Pas de 7000 pas', xp: -40 },
+      noWater: { title: 'Pas assez d\'eau', xp: -30 },
+      missedWorkout: { title: 'Pas de sport', xp: -50 },
+      junkFood: { title: 'Junk food', xp: -45 },
+      noWork: { title: isWeekend ? 'Pas travaillé 3-4h' : 'Pas travaillé 8h', xp: isWeekend ? -35 : -60 },
+      noReading: { title: 'Pas de lecture', xp: -35 },
+      noPost: { title: 'Pas de post', xp: -40 },
+      phoneWake: { title: 'Tel au réveil', xp: -40 },
+      phoneSleep: { title: 'Tel au coucher', xp: -40 },
+      procrastination: { title: 'Procrastination', xp: -50 },
+      stayedUpLate: { title: 'Couché après minuit', xp: -35 },
     };
 
     let xpChange = 0;
-    let statToUpdate = null;
     let actionTitle = '';
+
+    // Initialize stats if not present
+    if (!currentContent.stats) {
+      currentContent.stats = {
+        steps: 0,
+        workouts: 0,
+        workHours: 0,
+        readingMins: 0,
+        posts: 0,
+        sleepHours: 0
+      };
+    }
+    if (!currentContent.daysTracked) currentContent.daysTracked = 0;
+    if (!currentContent.questsCompleted) currentContent.questsCompleted = 0;
+    if (!currentContent.questsTotal) currentContent.questsTotal = 0;
 
     // 3. Process the action
     if (action === 'quest' && questId && quests[questId]) {
       if (!currentContent.completedToday.includes(questId)) {
         currentContent.completedToday.push(questId);
         xpChange = quests[questId].xp;
-        statToUpdate = quests[questId].stat;
         actionTitle = quests[questId].title;
+        currentContent.questsCompleted++;
+        currentContent.questsTotal++;
       } else {
         return res.status(200).json({ message: 'Quest already completed today', xp: currentContent.xp });
       }
@@ -103,16 +118,31 @@ export default async function handler(req, res) {
       if (!currentContent.penaltiesToday.includes(penaltyId)) {
         currentContent.penaltiesToday.push(penaltyId);
         xpChange = penalties[penaltyId].xp;
-        statToUpdate = penalties[penaltyId].stat;
         actionTitle = penalties[penaltyId].title;
+        currentContent.questsTotal++;
       } else {
         return res.status(200).json({ message: 'Penalty already applied today', xp: currentContent.xp });
       }
+    } else if (action === 'stats' && stats) {
+      // Update daily stats (steps, workHours, readingMins, sleepHours, etc.)
+      if (stats.steps) currentContent.stats.steps += stats.steps;
+      if (stats.workouts) currentContent.stats.workouts += stats.workouts;
+      if (stats.workHours) currentContent.stats.workHours += stats.workHours;
+      if (stats.readingMins) currentContent.stats.readingMins += stats.readingMins;
+      if (stats.posts) currentContent.stats.posts += stats.posts;
+      if (stats.sleepHours) currentContent.stats.sleepHours += stats.sleepHours;
+      actionTitle = 'Stats mises à jour';
+    } else if (action === 'newday') {
+      // Start a new day - increment daysTracked and reset daily completions
+      currentContent.daysTracked++;
+      currentContent.completedToday = [];
+      currentContent.penaltiesToday = [];
+      actionTitle = 'Nouveau jour';
     } else if (action === 'custom' && customAction) {
       xpChange = customXp || 0;
       actionTitle = customAction;
     } else if (action === 'reset') {
-      // Reset daily quests and penalties (for new day)
+      // Full reset
       currentContent.completedToday = [];
       currentContent.penaltiesToday = [];
       actionTitle = 'Reset journalier';
@@ -120,13 +150,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid action or missing parameters' });
     }
 
-    // 4. Update XP and stats
+    // 4. Update XP
     currentContent.xp = Math.max(0, (currentContent.xp || 0) + xpChange);
-
-    if (statToUpdate && currentContent.stats[statToUpdate] !== undefined) {
-      const statChange = xpChange > 0 ? 1 : (xpChange < 0 ? -1 : 0);
-      currentContent.stats[statToUpdate] = Math.max(1, currentContent.stats[statToUpdate] + statChange);
-    }
 
     // 5. Calculate new level
     const calculateLevel = (xp) => {
@@ -187,12 +212,17 @@ export default async function handler(req, res) {
       throw new Error(`GitHub API error: ${errorData.message}`);
     }
 
+    const winRate = currentContent.questsTotal > 0
+      ? Math.round((currentContent.questsCompleted / currentContent.questsTotal) * 100)
+      : 0;
+
     return res.status(200).json({
       success: true,
       message: `${actionTitle} ${xpChange >= 0 ? '+' : ''}${xpChange} XP`,
       xp: currentContent.xp,
       level: currentContent.level,
       rank: currentContent.rank,
+      winRate: winRate,
     });
 
   } catch (error) {

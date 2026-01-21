@@ -177,23 +177,26 @@
 
 /* Stats Grid */
 .stats-grid {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
   position: relative;
   z-index: 1;
 }
 
 .stat-item {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(15, 15, 26, 0.8) 100%);
-  padding: 12px 8px;
+  padding: 10px 6px;
   border-radius: 12px;
   border: 1px solid var(--border-color);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-item.win-rate {
+  grid-column: span 1;
 }
 
 .stat-item:hover {
@@ -218,9 +221,24 @@
 
 .stat-value {
   font-family: 'Orbitron', sans-serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-primary);
+}
+
+.stat-avg {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: -2px;
+}
+
+.stat-item.win-rate {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(15, 15, 26, 0.8) 100%);
+  border-color: var(--accent-gold);
+}
+
+.stat-item.win-rate .stat-value {
+  color: var(--accent-gold);
 }
 
 /* Today Summary */
