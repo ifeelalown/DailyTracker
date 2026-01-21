@@ -26,33 +26,51 @@ const getRank = (level) => {
   return { name: 'E', color: '#888888', glow: 'none' }
 }
 
+// Vérifier si c'est le weekend
+const isWeekend = () => {
+  const day = new Date().getDay()
+  return day === 0 || day === 6
+}
+
 // Quêtes par défaut - Système DIFFICILE (peu d'XP à gagner)
-const DEFAULT_QUESTS = [
-  // Santé & Sport
-  { id: 'steps', title: '7000 Pas', description: 'Faire 7000 pas dans la journée', xp: 15, stat: 'endurance', category: 'sport', icon: '👟' },
-  { id: 'water', title: 'Hydratation', description: 'Boire 2L d\'eau', xp: 10, stat: 'vitality', category: 'sport', icon: '💧' },
-  { id: 'workout', title: 'Sport', description: 'Une séance de sport', xp: 20, stat: 'strength', category: 'sport', icon: '💪' },
-  { id: 'eatHealthy', title: 'Manger Sain', description: 'Alimentation saine aujourd\'hui', xp: 15, stat: 'vitality', category: 'sport', icon: '🥗' },
-  // Productivité & Discipline
-  { id: 'work8h', title: 'Travail 8h', description: 'Travailler 8 heures', xp: 25, stat: 'intelligence', category: 'productivity', icon: '💼' },
-  { id: 'reading', title: 'Lecture', description: 'Lire 30 minutes', xp: 15, stat: 'intelligence', category: 'productivity', icon: '📖' },
-  { id: 'noPhoneWake', title: 'Réveil Sans Tel', description: 'Pas de téléphone au réveil', xp: 10, stat: 'discipline', category: 'productivity', icon: '🌅' },
-  { id: 'noPhoneSleep', title: 'Coucher Sans Tel', description: 'Pas de téléphone au coucher', xp: 10, stat: 'discipline', category: 'productivity', icon: '🌙' },
-]
+const getDefaultQuests = () => {
+  const weekend = isWeekend()
+  return [
+    // Santé & Sport
+    { id: 'steps', title: '7000 Pas', description: 'Faire 7000 pas dans la journée', xp: 15, stat: 'endurance', category: 'sport', icon: '👟' },
+    { id: 'water', title: 'Hydratation', description: 'Boire 2L d\'eau', xp: 10, stat: 'vitality', category: 'sport', icon: '💧' },
+    { id: 'workout', title: 'Sport', description: 'Une séance de sport', xp: 20, stat: 'strength', category: 'sport', icon: '💪' },
+    { id: 'eatHealthy', title: 'Manger Sain', description: 'Alimentation saine aujourd\'hui', xp: 15, stat: 'vitality', category: 'sport', icon: '🥗' },
+    // Productivité & Discipline
+    { id: 'work', title: weekend ? 'Travail 3-4h' : 'Travail 8h', description: weekend ? 'Travailler 3-4 heures (weekend)' : 'Travailler 8 heures', xp: weekend ? 15 : 25, stat: 'intelligence', category: 'productivity', icon: '💼' },
+    { id: 'reading', title: 'Lecture', description: 'Lire 30 minutes', xp: 15, stat: 'intelligence', category: 'productivity', icon: '📖' },
+    { id: 'post', title: '1 Post', description: 'Publier au moins 1 post', xp: 20, stat: 'discipline', category: 'productivity', icon: '📱' },
+    { id: 'noPhoneWake', title: 'Réveil Sans Tel', description: 'Pas de téléphone au réveil', xp: 10, stat: 'discipline', category: 'productivity', icon: '🌅' },
+    { id: 'noPhoneSleep', title: 'Coucher Sans Tel', description: 'Pas de téléphone au coucher', xp: 10, stat: 'discipline', category: 'productivity', icon: '🌙' },
+  ]
+}
+
+const DEFAULT_QUESTS = getDefaultQuests()
 
 // Pénalités - Système DIFFICILE (beaucoup d'XP à perdre)
-const PENALTIES = [
-  { id: 'missedSteps', title: 'Pas de 7000 pas', xp: -40, stat: 'endurance' },
-  { id: 'noWater', title: 'Pas assez d\'eau', xp: -30, stat: 'vitality' },
-  { id: 'missedWorkout', title: 'Pas de sport', xp: -50, stat: 'strength' },
-  { id: 'junkFood', title: 'Junk food / Mal mangé', xp: -45, stat: 'vitality' },
-  { id: 'noWork', title: 'Pas travaillé 8h', xp: -60, stat: 'intelligence' },
-  { id: 'noReading', title: 'Pas de lecture', xp: -35, stat: 'intelligence' },
-  { id: 'phoneWake', title: 'Tel au réveil', xp: -40, stat: 'discipline' },
-  { id: 'phoneSleep', title: 'Tel au coucher', xp: -40, stat: 'discipline' },
-  { id: 'procrastination', title: 'Procrastination', xp: -50, stat: 'discipline' },
-  { id: 'stayedUpLate', title: 'Couché après minuit', xp: -35, stat: 'vitality' },
-]
+const getPenalties = () => {
+  const weekend = isWeekend()
+  return [
+    { id: 'missedSteps', title: 'Pas de 7000 pas', xp: -40, stat: 'endurance' },
+    { id: 'noWater', title: 'Pas assez d\'eau', xp: -30, stat: 'vitality' },
+    { id: 'missedWorkout', title: 'Pas de sport', xp: -50, stat: 'strength' },
+    { id: 'junkFood', title: 'Junk food / Mal mangé', xp: -45, stat: 'vitality' },
+    { id: 'noWork', title: weekend ? 'Pas travaillé 3-4h' : 'Pas travaillé 8h', xp: weekend ? -35 : -60, stat: 'intelligence' },
+    { id: 'noReading', title: 'Pas de lecture', xp: -35, stat: 'intelligence' },
+    { id: 'noPost', title: 'Pas de post', xp: -40, stat: 'discipline' },
+    { id: 'phoneWake', title: 'Tel au réveil', xp: -40, stat: 'discipline' },
+    { id: 'phoneSleep', title: 'Tel au coucher', xp: -40, stat: 'discipline' },
+    { id: 'procrastination', title: 'Procrastination', xp: -50, stat: 'discipline' },
+    { id: 'stayedUpLate', title: 'Couché après minuit', xp: -35, stat: 'vitality' },
+  ]
+}
+
+const PENALTIES = getPenalties()
 
 function App() {
   // État du joueur - chargé depuis le JSON public
@@ -216,14 +234,27 @@ function App() {
     )
   }
 
+  // Calcul de la puissance totale
+  const totalPower = useMemo(() => {
+    const statsSum = Object.values(player.stats).reduce((a, b) => a + b, 0)
+    return Math.floor((level * 100) + (statsSum * 2) + (player.xp / 10))
+  }, [level, player.stats, player.xp])
+
+  const weekend = isWeekend()
+
   return (
     <div className="app">
-      {/* Dernière mise à jour */}
-      {publicData?.lastUpdated && (
-        <div style={{ textAlign: 'center', padding: '10px', color: 'var(--text-muted)', fontSize: '12px' }}>
-          Dernière mise à jour: {new Date(publicData.lastUpdated).toLocaleString('fr-FR')}
-        </div>
-      )}
+      {/* Status Bar */}
+      <div className="status-bar">
+        <span className={`day-type ${weekend ? 'weekend' : 'weekday'}`}>
+          {weekend ? 'WEEKEND' : 'SEMAINE'}
+        </span>
+        {publicData?.lastUpdated && (
+          <span>
+            MAJ: {new Date(publicData.lastUpdated).toLocaleString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        )}
+      </div>
 
       {/* Header avec stats du joueur */}
       <header className="player-header">
@@ -275,6 +306,11 @@ function App() {
           </div>
         </div>
       </header>
+
+      {/* Power Display */}
+      <div className="power-display">
+        <div className="power-value">{totalPower.toLocaleString()}</div>
+      </div>
 
       {/* Today summary */}
       <div className="today-summary">
